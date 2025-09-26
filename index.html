@@ -37,9 +37,8 @@
       gap:8px;
       z-index:1600;
       align-items:center;
-      pointer-events: none; /* allow Leaflet controls to remain clickable */
+      pointer-events: none;
     }
-    /* individual control buttons we add (Daftar Isi) */
     .controls-topright > .btn {
       pointer-events: auto;
       background: #fff;
@@ -51,10 +50,9 @@
       cursor:pointer;
     }
 
-    /* Legend (Daftar Isi) box */
     .legend {
       position: absolute;
-      top: 90px;       /* <-- diturunkan supaya muncul di bawah search box */
+      top: 90px;
       right: 10px;
       z-index:1500;
       background:#fff;
@@ -71,7 +69,6 @@
     .legend li { cursor:pointer; padding:6px; border-radius:6px; color:#0563a3; }
     .legend li:hover { background:#f5f7fb; }
 
-    /* Toggle layout for mobile: stack panorama above map and adjust legend */
     @media (max-width: 768px) {
       main { flex-direction:column; }
       #panorama, #map { width:100%; height:50vh; }
@@ -87,7 +84,6 @@
       .legend li { background:#fff; color:#0563a3; border:1px solid #eee; padding:8px 10px; }
     }
 
-    /* small improvement for popup on panorama (Pannellum's overlay text) */
     .pano-label {
       position:absolute;
       left:8px; bottom:8px;
@@ -102,18 +98,13 @@
   <header>Virtual Assessment 360° Untuk Proses Pengadaan Tanah - Zona Rokan</header>
 
   <main>
-    <!-- Panorama -->
     <div id="panorama"></div>
-
-    <!-- Map -->
     <div id="map"></div>
 
-    <!-- Top-right container: we keep it empty so Leaflet's geocoder & controls appear, but we'll add custom Daftar Isi -->
     <div class="controls-topright" id="myControls">
       <button id="legendBtn" class="btn">📑 Daftar Isi</button>
     </div>
 
-    <!-- Legend panel -->
     <div class="legend" id="legendPanel" aria-hidden="true">
       <h4>Layer</h4>
       <label><input type="checkbox" id="chkKecamatan"> Batas Kecamatan</label>
@@ -129,7 +120,6 @@
       </ul>
     </div>
 
-    <!-- small label on panorama for current scene name -->
     <div class="pano-label" id="panoLabel">A</div>
   </main>
 
@@ -141,21 +131,17 @@
   <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
 
   <script>
-    // ---------- Initialize Leaflet map ----------
     var map = L.map('map', { zoomControl: true }).setView([0.7, 101.4], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Add scale and fullscreen
     L.control.scale().addTo(map);
     L.control.fullscreen({ position: 'topleft' }).addTo(map);
 
-    // Add geocoder (search) to top right
     var geocoderControl = L.Control.geocoder({ position: 'topright' }).addTo(map);
 
-    // Add a small geolocate button (left)
     L.control.locate = function(opts) {
       var control = L.control({ position: 'topleft' });
       control.onAdd = function () {
@@ -176,7 +162,6 @@
     };
     L.control.locate().addTo(map);
 
-    // Handle location found
     var userMarker;
     map.on('locationfound', function(e){
       if (!userMarker) {
@@ -186,7 +171,6 @@
       }
     });
 
-    // ---------- Pannellum viewer ----------
     var viewer = pannellum.viewer('panorama', {
       default: { firstScene: "sceneA", sceneFadeDuration: 600 },
       scenes: {
@@ -199,23 +183,21 @@
       }
     });
 
-    // Update pano label on scene change
     var panoLabel = document.getElementById('panoLabel');
     viewer.on('load', function() {
       var curr = viewer.getScene();
-      // scene names: sceneA ... sceneF -> show first char uppercase
       var label = curr.replace('scene','').toUpperCase();
       panoLabel.textContent = label;
     });
 
     // ---------- Markers + linkage to panoramas ----------
     var markerData = {
-      a: { coords: [0.777833, 101.400333], scene: 'sceneA', name: 'Pipa Air Well 5C-58' },
-      b: { coords: [1.255722, 101.130778], scene: 'sceneB', name: 'BEKA25_0007' },
-      c: { coords: [1.254083, 101.132306], scene: 'sceneC', name: 'BEKA_#71' },
-      d: { coords: [0.844583, 101.385000], scene: 'sceneD', name: 'P_MINA25_0017HW' },
-      e: { coords: [0.703194, 101.485667], scene: 'sceneE', name: '9D-28E' },
-      f: { coords: [0.684500, 101.111500], scene: 'sceneF', name: 'KB 500' }
+      a: { coords: [0.777833, 101.400333], scene: 'sceneA', name: 'Pipa Air Well 5C-58', jenis: 'BMN', pemilik: 'PHR' },
+      b: { coords: [1.255722, 101.130778], scene: 'sceneB', name: 'BEKA25_0007', jenis: 'SHM', pemilik: 'Parhorasan' },
+      c: { coords: [1.254083, 101.132306], scene: 'sceneC', name: 'BEKA_#71', jenis: 'SKGR', pemilik: 'Robert' },
+      d: { coords: [0.844583, 101.385000], scene: 'sceneD', name: 'P_MINA25_0017HW', jenis: 'SKT', pemilik: 'Mesdi Br Sagala' },
+      e: { coords: [0.703194, 101.485667], scene: 'sceneE', name: '9D-28E', jenis: 'SHM', pemilik: 'Tober Gultom' },
+      f: { coords: [0.684500, 101.111500], scene: 'sceneF', name: 'KB 500', jenis: 'BMN', pemilik: 'Tiara Dewi P' }
     };
 
     var markers = {};
@@ -225,11 +207,14 @@
       (function(key){
         var d = markerData[key];
         var m = L.marker(d.coords, {icon: iconDefault}).addTo(map)
-          .bindPopup("<b>" + d.name + "</b><br>" + d.coords[0].toFixed(6) + ", " + d.coords[1].toFixed(6));
+          .bindPopup(
+            "<b>" + d.name + "</b><br>" +
+            "Koordinat: " + d.coords[0].toFixed(6) + ", " + d.coords[1].toFixed(6) + "<br>" +
+            "Jenis Tanah: " + d.jenis + "<br>" +
+            "Nama Pemilik: " + d.pemilik
+          );
         m.on('click', function(){
-          // open panorama scene when marker clicked
           viewer.loadScene(d.scene);
-          // show label on pano
           panoLabel.textContent = key.toUpperCase();
         });
         markers[key] = m;
@@ -243,11 +228,9 @@
     var locationList = document.getElementById('locationList');
 
     legendBtn.addEventListener('click', function(e){
-      // toggle visibility
       legendPanel.style.display = (legendPanel.style.display === 'block') ? 'none' : 'block';
     });
 
-    // click on each li -> fly to marker + open popup + change pano
     locationList.querySelectorAll('li').forEach(function(li){
       li.addEventListener('click', function(){
         var key = this.getAttribute('data-key');
@@ -256,18 +239,14 @@
         if (m) {
           map.flyTo(m.getLatLng(), 16, {animate:true, duration:1.2});
           m.openPopup();
-          // switch panorama
           var scene = markerData[key].scene;
           viewer.loadScene(scene);
-          // update label
           panoLabel.textContent = key.toUpperCase();
-          // close legend on mobile for clarity
           if (window.innerWidth <= 768) legendPanel.style.display = 'none';
         }
       });
     });
 
-    // Toggle Batas Kecamatan: attempt to load shapefile `batas_kecamatan.zip` via shpjs
     var kecamatanLayer = null;
     fetch('batas_kecamatan.zip').then(function(r){
       if (!r.ok) throw new Error('not found');
@@ -276,10 +255,8 @@
       return shp(buf);
     }).then(function(geojson){
       kecamatanLayer = L.geoJSON(geojson, { style:{ color:'#d9534f', weight:2, fillOpacity:0.12 } });
-      // do not auto-add; only add when checkbox is checked
       if (chkKec.checked) kecamatanLayer.addTo(map);
     }).catch(function(){
-      // fallback: create a dummy polygon for demo so toggle still visible
       var demoPoly = {
         "type":"Feature",
         "geometry":{"type":"Polygon","coordinates":[[
@@ -296,7 +273,6 @@
       if (this.checked) map.addLayer(kecamatanLayer); else map.removeLayer(kecamatanLayer);
     });
 
-    // close legend if click outside (nice UX)
     document.addEventListener('click', function(evt){
       var isClickInside = legendPanel.contains(evt.target) || legendBtn.contains(evt.target);
       if (!isClickInside && legendPanel.style.display === 'block') {
@@ -304,34 +280,25 @@
       }
     });
 
-    // ensure legend position slightly lower than geocoder: if geocoder element exists, compute its bbox and set legend top
     function adjustLegendUnderControls() {
       try {
-        // geocoder control lives in .leaflet-control-container; find rightmost control's bottom
         var container = map.getContainer().querySelector('.leaflet-top.leaflet-right');
         if (container) {
           var rect = container.getBoundingClientRect();
-          // set legend top to rect.bottom + 8 relative to map container
           var mapRect = map.getContainer().getBoundingClientRect();
           var topPx = (rect.bottom - mapRect.top) + 8;
-          // but cap minimal value
           if (topPx < 50) topPx = 50;
           legendPanel.style.top = topPx + 'px';
-          // also move legendBtn a bit down
           var btnTop = topPx - 40;
           if (btnTop < 8) btnTop = 8;
           document.querySelector('.controls-topright').style.top = btnTop + 'px';
         }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
 
-    // adjust after map and controls render
     setTimeout(adjustLegendUnderControls, 800);
     window.addEventListener('resize', adjustLegendUnderControls);
 
-    // when panorama loads a scene programmatically, update label
     viewer.on('scenechange', function() {
       var s = viewer.getScene();
       var letter = (s.replace('scene','') || 'A').toUpperCase();
