@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css"/>
 
   <style>
-    /* Layout: header + split view */
     body { margin:0; font-family: Arial, sans-serif; height:100vh; display:flex; flex-direction:column; }
     header {
       background: linear-gradient(90deg, #0071bb, #00a859);
@@ -23,74 +22,38 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     main { flex:1; display:flex; height: calc(100vh - 56px); position:relative; }
-
-    /* left = panorama, right = map */
     #panorama { width:50%; height:100%; }
     #map { width:50%; height:100%; }
-
-    /* controls container top-right (search, fullscreen, daftar isi) */
     .controls-topright {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display:flex;
-      gap:8px;
-      z-index:1600;
-      align-items:center;
-      pointer-events: none;
+      position: absolute; top: 10px; right: 10px;
+      display:flex; gap:8px; z-index:1600; align-items:center; pointer-events: none;
     }
     .controls-topright > .btn {
-      pointer-events: auto;
-      background: #fff;
-      border:1px solid #ccc;
-      border-radius:6px;
-      padding:6px 10px;
-      font-size:14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-      cursor:pointer;
+      pointer-events: auto; background: #fff;
+      border:1px solid #ccc; border-radius:6px; padding:6px 10px; font-size:14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12); cursor:pointer;
     }
-
     .legend {
-      position: absolute;
-      top: 90px;
-      right: 10px;
-      z-index:1500;
-      background:#fff;
-      border-radius:8px;
-      padding:10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-      max-width:320px;
-      display:none;
-      font-size:14px;
+      position: absolute; top: 90px; right: 10px; z-index:1500;
+      background:#fff; border-radius:8px; padding:10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12); max-width:320px; display:none; font-size:14px;
     }
     .legend h4 { margin:0 0 6px 0; font-size:15px; }
     .legend hr { margin:8px 0; border:none; border-top:1px solid #eee; }
     .legend ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
     .legend li { cursor:pointer; padding:6px; border-radius:6px; color:#0563a3; }
     .legend li:hover { background:#f5f7fb; }
-
     @media (max-width: 768px) {
       main { flex-direction:column; }
       #panorama, #map { width:100%; height:50vh; }
-      .legend {
-        left: 6px;
-        right: 6px;
-        top: auto;
-        bottom: 12px;
-        max-width: none;
-        display:none;
-      }
+      .legend { left: 6px; right: 6px; top: auto; bottom: 12px; max-width: none; display:none; }
       .legend ul { flex-direction:row; flex-wrap:wrap; gap:8px; }
       .legend li { background:#fff; color:#0563a3; border:1px solid #eee; padding:8px 10px; }
     }
-
     .pano-label {
-      position:absolute;
-      left:8px; bottom:8px;
-      background: rgba(0,0,0,0.5);
-      color:#fff; padding:6px 8px; border-radius:4px; font-weight:700;
-      z-index:1200;
-      font-size:13px;
+      position:absolute; left:8px; bottom:8px;
+      background: rgba(0,0,0,0.5); color:#fff; padding:6px 8px; border-radius:4px; font-weight:700;
+      z-index:1200; font-size:13px;
     }
   </style>
 </head>
@@ -117,6 +80,7 @@
         <li data-key="d">D : P_MINA25_0017HW</li>
         <li data-key="e">E : 9D-28E</li>
         <li data-key="f">F : KB 500</li>
+        <li data-key="g">G : Well-39</li> <!-- Tambahan baru -->
       </ul>
     </div>
 
@@ -179,7 +143,8 @@
         "sceneC": { title: "C", type: "equirectangular", panorama: "foto360c.jpg", hfov:110 },
         "sceneD": { title: "D", type: "equirectangular", panorama: "foto360d.jpg", hfov:110 },
         "sceneE": { title: "E", type: "equirectangular", panorama: "foto360e.jpg", hfov:110 },
-        "sceneF": { title: "F", type: "equirectangular", panorama: "foto360f.jpg", hfov:110 }
+        "sceneF": { title: "F", type: "equirectangular", panorama: "foto360f.jpg", hfov:110 },
+        "sceneG": { title: "G", type: "equirectangular", panorama: "foto360g.jpg", hfov:110 } <!-- Tambahan baru -->
       }
     });
 
@@ -190,14 +155,14 @@
       panoLabel.textContent = label;
     });
 
-    // ---------- Markers + linkage to panoramas ----------
     var markerData = {
       a: { coords: [0.777833, 101.400333], scene: 'sceneA', name: 'Pipa Air Well 5C-58', jenis: 'BMN', pemilik: 'PHR' },
       b: { coords: [1.255722, 101.130778], scene: 'sceneB', name: 'BEKA25_0007', jenis: 'SHM', pemilik: 'Parhorasan' },
       c: { coords: [1.254083, 101.132306], scene: 'sceneC', name: 'BEKA_#71', jenis: 'SKGR', pemilik: 'Robert' },
       d: { coords: [0.844583, 101.385000], scene: 'sceneD', name: 'P_MINA25_0017HW', jenis: 'SKT', pemilik: 'Mesdi Br Sagala' },
       e: { coords: [0.703194, 101.485667], scene: 'sceneE', name: '9D-28E', jenis: 'SHM', pemilik: 'Tober Gultom' },
-      f: { coords: [0.684500, 101.111500], scene: 'sceneF', name: 'KB 500', jenis: 'BMN', pemilik: 'Tiara Dewi P' }
+      f: { coords: [0.684500, 101.111500], scene: 'sceneF', name: 'KB 500', jenis: 'BMN', pemilik: 'Tiara Dewi P' },
+      g: { coords: [1.120917, 101.263444], scene: 'sceneG', name: 'Well-39', jenis: 'BMN', pemilik: 'PHR' } // Tambahan baru
     };
 
     var markers = {};
@@ -221,7 +186,6 @@
       })(k);
     }
 
-    // ---------- Legend / Daftar Isi behaviors ----------
     var legendBtn = document.getElementById('legendBtn');
     var legendPanel = document.getElementById('legendPanel');
     var chkKec = document.getElementById('chkKecamatan');
