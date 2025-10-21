@@ -107,7 +107,6 @@
 
     L.control.scale().addTo(map);
     L.control.fullscreen({ position: 'topleft' }).addTo(map);
-
     var geocoderControl = L.Control.geocoder({ position: 'topright' }).addTo(map);
 
     L.control.locate = function(opts) {
@@ -121,9 +120,7 @@
         btn.style.fontSize = '16px';
         btn.style.borderRadius = '4px';
         btn.style.cursor = 'pointer';
-        btn.onclick = function() {
-          map.locate({ setView:true, maxZoom:16 });
-        };
+        btn.onclick = function() { map.locate({ setView:true, maxZoom:16 }); };
         return btn;
       };
       return control;
@@ -171,10 +168,10 @@
       e: { coords: [0.703194, 101.485667], scene: 'sceneE', name: '9D-28E', jenis: 'SHM', pemilik: 'Tober Gultom' },
       f: { coords: [0.684500, 101.111500], scene: 'sceneF', name: 'KB 500', jenis: 'BMN', pemilik: 'Tiara Dewi P' },
       g: { coords: [1.120917, 101.263444], scene: 'sceneG', name: 'Well-39', jenis: 'BMN', pemilik: 'PHR' },
-      h: { coords: [1.010000, 101.220000], scene: 'sceneH', name: 'P_Gent26_0001', jenis: 'SHM', pemilik: 'Zulkifli' },
-      i: { coords: [0.950000, 101.310000], scene: 'sceneI', name: 'P_4B-54B & P_4B-63E', jenis: 'BMN', pemilik: 'PHR' },
-      j: { coords: [0.820000, 101.420000], scene: 'sceneJ', name: 'BLM_SO_542', jenis: 'BMN', pemilik: 'PHR' },
-      k: { coords: [0.870000, 101.500000], scene: 'sceneK', name: 'P_KIRA24_02 & KIRA24_01', jenis: 'SKT dan SKGR', pemilik: 'Suryani Rambe' }
+      h: { coords: [1.677083, 101.049861], scene: 'sceneH', name: 'P_Gent26_0001', jenis: 'SHM', pemilik: 'Zulkifli' },
+      i: { coords: [0.814278, 101.351361], scene: 'sceneI', name: 'P_4B-54B & P_4B-63E', jenis: 'BMN', pemilik: 'PHR' },
+      j: { coords: [1.671750, 100.748806], scene: 'sceneJ', name: 'BLM_SO_542', jenis: 'BMN', pemilik: 'PHR' },
+      k: { coords: [1.366194, 101.045833], scene: 'sceneK', name: 'P_KIRA24_02 & KIRA24_01', jenis: 'SKT dan SKGR', pemilik: 'Suryani Rambe' }
     };
 
     var markers = {};
@@ -203,7 +200,7 @@
     var chkKec = document.getElementById('chkKecamatan');
     var locationList = document.getElementById('locationList');
 
-    legendBtn.addEventListener('click', function(e){
+    legendBtn.addEventListener('click', function(){
       legendPanel.style.display = (legendPanel.style.display === 'block') ? 'none' : 'block';
     });
 
@@ -222,65 +219,6 @@
         }
       });
     });
-
-    var kecamatanLayer = null;
-    fetch('batas_kecamatan.zip').then(function(r){
-      if (!r.ok) throw new Error('not found');
-      return r.arrayBuffer();
-    }).then(function(buf){
-      return shp(buf);
-    }).then(function(geojson){
-      kecamatanLayer = L.geoJSON(geojson, { style:{ color:'#d9534f', weight:2, fillOpacity:0.12 } });
-      if (chkKec.checked) kecamatanLayer.addTo(map);
-    }).catch(function(){
-      var demoPoly = {
-        "type":"Feature",
-        "geometry":{"type":"Polygon","coordinates":[[
-          [101.2,0.6],[101.7,0.6],[101.7,0.9],[101.2,0.9],[101.2,0.6]
-        ]]}
-      };
-      kecamatanLayer = L.geoJSON(demoPoly, { style:{ color:'#d9534f', weight:2, fillOpacity:0.08 } });
-      if (chkKec.checked) kecamatanLayer.addTo(map);
-      console.log('batas_kecamatan.zip tidak ditemukan. Menggunakan demo polygon.');
-    });
-
-    chkKec.addEventListener('change', function(){
-      if (!kecamatanLayer) return;
-      if (this.checked) map.addLayer(kecamatanLayer); else map.removeLayer(kecamatanLayer);
-    });
-
-    document.addEventListener('click', function(evt){
-      var isClickInside = legendPanel.contains(evt.target) || legendBtn.contains(evt.target);
-      if (!isClickInside && legendPanel.style.display === 'block') {
-        legendPanel.style.display = 'none';
-      }
-    });
-
-    function adjustLegendUnderControls() {
-      try {
-        var container = map.getContainer().querySelector('.leaflet-top.leaflet-right');
-        if (container) {
-          var rect = container.getBoundingClientRect();
-          var mapRect = map.getContainer().getBoundingClientRect();
-          var topPx = (rect.bottom - mapRect.top) + 8;
-          if (topPx < 50) topPx = 50;
-          legendPanel.style.top = topPx + 'px';
-          var btnTop = topPx - 40;
-          if (btnTop < 8) btnTop = 8;
-          document.querySelector('.controls-topright').style.top = btnTop + 'px';
-        }
-      } catch (e) {}
-    }
-
-    setTimeout(adjustLegendUnderControls, 800);
-    window.addEventListener('resize', adjustLegendUnderControls);
-
-    viewer.on('scenechange', function() {
-      var s = viewer.getScene();
-      var letter = (s.replace('scene','') || 'A').toUpperCase();
-      panoLabel.textContent = letter;
-    });
-
   </script>
 </body>
 </html>
