@@ -70,7 +70,7 @@
 
     <div class="legend" id="legendPanel" aria-hidden="true">
       <h4>Layer</h4>
-      <label><input type="checkbox" id="chkKecamatan"> Batas Well</label>
+      <label><input type="checkbox" id="chkKecamatan"> Batas Area</label>
       <hr>
       <h4>Lokasi</h4>
       <ul id="locationList">
@@ -200,7 +200,7 @@
     var chkKec = document.getElementById('chkKecamatan');
     var locationList = document.getElementById('locationList');
 
-    // === Tambahan kode batas well ===
+    // === Tambahan kode batas area ===
     var batasWellLayer;
     fetch('batas_well.zip')
       .then(res => res.arrayBuffer())
@@ -212,13 +212,13 @@
           },
           onEachFeature: function (feature, layer) {
             if (feature.properties) {
-              let nama = feature.properties.NAMOBJ || feature.properties.NAMA_WELL || "Batas Well";
-              layer.bindPopup("<b>Nama Well:</b> " + nama);
+              let nama = feature.properties.NAMOBJ || feature.properties.NAMA_WELL || "Batas Area";
+              layer.bindPopup("<b>Nama Area:</b> " + nama);
             }
           }
         });
       })
-      .catch(err => console.error("Gagal memuat batas well:", err));
+      .catch(err => console.error("Gagal memuat batas area:", err));
 
     chkKec.addEventListener('change', function() {
       if (chkKec.checked) {
@@ -227,7 +227,7 @@
         if (batasWellLayer) map.removeLayer(batasWellLayer);
       }
     });
-    // === Akhir tambahan kode batas well ===
+    // === Akhir tambahan kode batas area ===
 
     legendBtn.addEventListener('click', function(){
       legendPanel.style.display = (legendPanel.style.display === 'block') ? 'none' : 'block';
